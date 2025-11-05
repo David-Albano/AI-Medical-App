@@ -1,19 +1,17 @@
+import os
 from django.shortcuts import render
 from django.db import transaction
+from chatbot.knowledge_helpers import extract_text_from_file, split_text_into_chunks
+from chatbot.rag_utils import retrieve_relevant_chunks
+from medical_ai.openai_client import get_openai_client
+from .models import ChatMessage, ChatSession, KnowledgeChunk
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from openai import OpenAI
 
-from chatbot.knowledge_helpers import extract_text_from_file, split_text_into_chunks
-from chatbot.rag_utils import retrieve_relevant_chunks
-
-from .models import ChatMessage, ChatSession, KnowledgeChunk
-
-client = OpenAI()
-
+client = get_openai_client()
 
 # --- MAIN ENDPOINT ---
 @api_view(["POST"])
@@ -23,6 +21,8 @@ def upload_knowledge_files(request):
     Upload multiple files -> extract text -> create KnowledgeChunk embeddings.
     """
     files = request.FILES.getlist("files")
+    print('\n\nfiles: ', files)
+
     if not files:
         return Response({"error": "No files provided."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -30,34 +30,40 @@ def upload_knowledge_files(request):
     results = []
 
     try:
-        with transaction.atomic():
-            for f in files:
-                text = extract_text_from_file(f)
-                if not text:
-                    results.append({"file": f.name, "status": "no_text_found"})
-                    continue
+        print('all goog going first')
+        # with transaction.atomic():
+        #     for f in files:
+        #         text = extract_text_from_file(f)
+        #         if not text:
+        #             results.append({"file": f.name, "status": "no_text_found"})
+        #             continue
 
-                chunks = split_text_into_chunks(text)
-                for chunk in chunks:
-                    embedding = client.embeddings.create(
-                        model="text-embedding-3-small",
-                        input=chunk
-                    ).data[0].embedding
+        #         chunks = split_text_into_chunks(text)
+        #         for chunk in chunks:
+        #             embedding = client.embeddings.create(
+        #                 model="text-embedding-3-small",
+        #                 input=chunk
+        #             ).data[0].embedding
 
-                    KnowledgeChunk.objects.create(
-                        title=f.name,
-                        content=chunk,
-                        embedding=embedding,
-                        source=f.name,
-                    )
-                    created_chunks += 1
+        #             KnowledgeChunk.objects.create(
+        #                 title=f.name,
+        #                 content=chunk,
+        #                 embedding=embedding,
+        #                 source=f.name,
+        #             )
+        #             created_chunks += 1
 
-                results.append({"file": f.name, "chunks_created": len(chunks)})
+        #         results.append({"file": f.name, "chunks_created": len(chunks)})
 
+        # return Response({
+        #     "status": "success",
+        #     "total_chunks": created_chunks,
+        #     "details": results
+        # })
         return Response({
-            "status": "success",
-            "total_chunks": created_chunks,
-            "details": results
+            "status": "testing",
+            "total_chunks": 0,
+            "details": []
         })
 
     except Exception as e:

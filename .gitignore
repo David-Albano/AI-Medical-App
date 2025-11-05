@@ -1,0 +1,9 @@
+client/.env
+client/node_modules
+*.pyc
+*.pyc
+*.pyc
+*.pyc
+server/chatbot/__pycache__/urls.cpython-313.pyc
+server/medical_ai/__pycache__/urls.cpython-313.pyc
+server/.env

@@ -1,0 +1,46 @@
+/* src/my_app_1_folder/styles/upload.css */
+.upload-page {
+  max-width: 600px;
+  margin: 50px auto;
+  text-align: center;
+}
+
+.file-upload-container {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.file-upload-container input[type="file"] {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.file-upload-container button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.file-upload-container button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.result {
+  margin-top: 20px;
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.error {
+  color: red;
+}
+
