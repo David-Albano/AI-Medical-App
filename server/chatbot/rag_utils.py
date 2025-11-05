@@ -17,10 +17,10 @@ def cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 
-def retrieve_relevant_chunks(query, top_k=3):
+def retrieve_relevant_chunks(query, knowledge_category, top_k=5):
     """Return top_k most relevant KnowledgeChunk texts."""
     query_emb = get_embedding(query)
-    chunks = KnowledgeChunk.objects.exclude(embedding__isnull=True)
+    chunks = KnowledgeChunk.objects.exclude(embedding__isnull=True, category__isnull=True).filter(category__pk__in=knowledge_category)
     
     scored = []
     for chunk in chunks:
@@ -31,4 +31,5 @@ def retrieve_relevant_chunks(query, top_k=3):
     
     scored.sort(reverse=True, key=lambda x: x[0])
     top_chunks = [text for _, text in scored[:top_k]]
+
     return top_chunks

@@ -1,4 +1,4 @@
-import os
+import os, tiktoken
 import tempfile
 from PyPDF2 import PdfReader
 from docx import Document
@@ -44,17 +44,29 @@ def extract_text_from_file(uploaded_file):
     return text.strip()
 
 # --- Utility: split into smaller chunks for embeddings ---
-def split_text_into_chunks(text, max_chars=1000):
-    """Splits long text into roughly token-sized chunks."""
+def split_text_into_chunks(text, max_tokens=7500, model="text-embedding-3-small"):
+    """Splits text into chunks that safely fit within token limits."""
+    enc = tiktoken.encoding_for_model(model)
     paragraphs = text.split("\n\n")
-    chunks, current = [], ""
+    chunks = []
+    current_tokens = []
+    current_length = 0
 
     for para in paragraphs:
-        if len(current) + len(para) < max_chars:
-            current += para + "\n\n"
+        tokens = enc.encode(para)
+        paragraph_len = len(tokens)
+
+        # If adding this paragraph would exceed the limit, start a new chunk
+        if current_length + paragraph_len > max_tokens:
+            if current_tokens:
+                chunks.append(enc.decode(current_tokens))
+            current_tokens = tokens
+            current_length = paragraph_len
         else:
-            chunks.append(current.strip())
-            current = para
-    if current:
-        chunks.append(current.strip())
+            current_tokens.extend(tokens)
+            current_length += paragraph_len
+
+    if current_tokens:
+        chunks.append(enc.decode(current_tokens))
+
     return chunks

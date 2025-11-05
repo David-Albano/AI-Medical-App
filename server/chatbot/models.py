@@ -1,14 +1,20 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+
+class MedicalCategory(models.Model):
+    name = models.CharField(max_length=255)
+
 
 class KnowledgeChunk(models.Model):
     """Stored documents for RAG (embedded medical info)"""
     title = models.CharField(max_length=255)
     content = models.TextField()
+    category = models.ForeignKey(MedicalCategory, on_delete=models.CASCADE)
     embedding = models.JSONField()  # store vector as list of floats
     source = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
-        return self.title
+        return f'{self.title} - {self.category.name}'
 
 
 class ChatSession(models.Model):

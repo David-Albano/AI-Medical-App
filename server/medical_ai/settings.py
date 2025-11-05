@@ -143,6 +143,7 @@ REST_FRAMEWORK = {
     ],
 }
 
+# AUTH_USER_MODEL = 'chatbot.CustomUser'
 
 
 # --- CORS HEADERS ---

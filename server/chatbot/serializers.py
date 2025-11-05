@@ -1,5 +1,10 @@
 from rest_framework import serializers
-from .models import KnowledgeChunk, ChatSession, ChatMessage
+from .models import MedicalCategory, KnowledgeChunk, ChatSession, ChatMessage
+
+class MedicalCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MedicalCategory
+        fields = '__all__'
 
 class KnowledgeChunkSerializer(serializers.ModelSerializer):
     class Meta:
