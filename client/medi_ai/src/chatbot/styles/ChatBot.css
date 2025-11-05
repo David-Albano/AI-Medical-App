@@ -2,9 +2,9 @@
 .chatbot {
   display: flex;
   gap: 1rem;
-  height: 100vh;
+  height: 95.2vh;
   font-family: 'Inter', sans-serif;
-  background-color: #f7f8fa; /* Soft light gray background */
+  background-color: #f0f2f8a9; /* Soft light gray background */
   color: #2c2c2c;
   padding: 1rem;
 }
