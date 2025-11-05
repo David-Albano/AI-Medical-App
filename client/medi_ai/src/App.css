@@ -32,3 +32,82 @@
   transform: translateY(-5px);
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
+
+/* Navbar container */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .5rem 2rem;
+  background: linear-gradient(0deg, #f3f4f7, #edf1f5); /* nice gradient */
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Logo styling */
+.navbar .logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-decoration: none;
+  color: #6799e4;
+  transition: transform 0.2s ease;
+}
+
+.navbar .logo:hover {
+  transform: scale(1.05);
+}
+
+/* Navbar links container */
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+/* Individual links */
+.nav-links a {
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+/* Hover effect for links */
+.nav-links a::after {
+  content: "";
+  display: block;
+  height: 2px;
+  background: #fff;
+  width: 0;
+  transition: width 0.3s;
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+}
+
+.nav-links a:hover {
+  color: #ffd700; /* gold highlight on hover */
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav-links {
+    margin-top: 0.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+}

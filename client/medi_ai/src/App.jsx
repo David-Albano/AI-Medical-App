@@ -3,6 +3,17 @@ import KnowledgeUploadPage from "./chatbot/pages/KnowledgeUploadPage";
 import ChatBot from "./chatbot/pages/ChatBot";
 import "./App.css";
 
+// Navbar component
+function Navbar() {
+  return (
+    <nav className="navbar">
+      <Link to="/" className="logo">
+        MyApp
+      </Link>
+    </nav>
+  );
+}
+
 // Reusable DashboardCard component
 function DashboardCard({ title, to }) {
   return (
@@ -12,6 +23,7 @@ function DashboardCard({ title, to }) {
   );
 }
 
+// Main dashboard page
 function MainPage() {
   return (
     <div className="main-page">
@@ -24,12 +36,24 @@ function MainPage() {
   );
 }
 
+// Layout component to wrap all pages with Navbar
+function Layout({ children }) {
+  return (
+    <div>
+      <Navbar />
+      <div className="page-content">{children}</div>
+    </div>
+  );
+}
+
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<MainPage />} />
-      <Route path="/chatbot" element={<ChatBot />} />
-      <Route path="/knowledge-upload" element={<KnowledgeUploadPage />} />
-    </Routes>
+    <Layout>
+      <Routes>
+        <Route path="/" element={<MainPage />} />
+        <Route path="/chatbot" element={<ChatBot />} />
+        <Route path="/knowledge-upload" element={<KnowledgeUploadPage />} />
+      </Routes>
+    </Layout>
   );
 }
