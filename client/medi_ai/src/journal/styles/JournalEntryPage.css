@@ -1,0 +1,213 @@
+/* 🌿 JournalEntryPage.css - Refined for calm, professional aesthetics */
+
+
+/* Center layout */
+.journal-entry-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: 40px 20px;
+    background: linear-gradient(160deg, #eef2ff 0%, #f9fbfd 100%);
+}
+
+/* Main card */
+.journal-entry-card {
+    background-color: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+    padding: 40px;
+    max-width: 650px;
+    width: 100%;
+    text-align: center;
+    transition: var(--transition);
+}
+
+.journal-entry-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(90, 141, 238, 0.15);
+}
+
+/* Headings */
+h1 {
+    color: var(--primary-color);
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    letter-spacing: 0.5px;
+}
+
+h2 {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+/* Journal Textarea */
+.journal-textarea {
+    width: 100%;
+    height: 8rem;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius);
+    font-size: 16px;
+    color: var(--text-color);
+    background-color: #f9fafb;
+    resize: none;
+    transition: var(--transition);
+    margin-top: 10px;
+}
+
+.journal-textarea:focus {
+    border-color: var(--primary-color);
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(90, 141, 238, 0.15);
+    outline: none;
+}
+
+/* Submit Button */
+.submit-btn {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 14px 30px;
+    font-size: 16px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    transition: var(--transition);
+    margin-top: 10px;
+}
+
+.submit-btn:disabled {
+    background-color: #a5b4fc;
+    cursor: not-allowed;
+}
+
+.submit-btn:hover:enabled {
+    background-color: #4b7be3;
+    transform: translateY(-1px);
+}
+
+/* Error Message */
+.error-message {
+    color: var(--error-color);
+    font-size: 14px;
+    margin-top: 8px;
+    font-weight: 500;
+}
+
+/* Feedback sections */
+.feedback-section {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 2px solid #f0f4f8;
+    text-align: left;
+    animation: fadeIn 0.6s ease;
+}
+
+/* Individual blocks for sentiment, emotion, and feedback */
+.feedback-block {
+    margin-bottom: 24px;
+    padding: 18px 20px;
+    border-radius: var(--radius);
+    background: #f9fafb;
+    border: 1px solid #eef2ff;
+    box-shadow: var(--shadow-soft);
+    transition: background 0.3s ease;
+}
+
+.feedback-block:hover {
+    background: #f8faff;
+}
+
+/* Sub-headers inside feedback */
+.feedback-block h3 {
+    color: var(--primary-color);
+    margin-bottom: 6px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sub_block_feedback {
+    display: flex;
+    align-items: start;
+    gap: 5px;
+}
+
+/* Justification style */
+.justification {
+    margin-top: 6px;
+    font-size: 0.95rem;
+    color: #4b5563;
+    background-color: #f3f4f6;
+    border-left: 4px solid var(--primary-color);
+    padding: 10px 14px;
+    border-radius: 6px;
+    line-height: 1.5;
+}
+
+/* AI feedback block distinct look */
+.ai-block {
+    background: #fdfdfd;
+    border-left: 4px solid #60a5fa;
+    padding: 20px;
+}
+
+.ai-block p {
+    font-size: 1rem;
+    color: #374151;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.feedback-card {
+    background-color: #fdfdfd;
+    border: 1px solid #eef2ff;
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow-soft);
+    animation: fadeIn 0.5s ease;
+}
+
+.feedback-card p {
+    font-size: 16px;
+    color: var(--text-color);
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.feedback-card strong {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Small fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Add subtle floating animation for calm vibe */
+@keyframes gentleFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+.journal-entry-card {
+    animation: gentleFloat 6s ease-in-out infinite;
+}

@@ -1,3 +1,158 @@
-from django.shortcuts import render
+import json
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from transformers import pipeline
+from medical_ai.openai_client import get_openai_client
+from .models import JournalEntry
+from .serializers import JournalEntrySerializer
 
-# Create your views here.
+client = get_openai_client()
+
+
+# Initialize Hugging Face pipelines (do this once)
+sentiment_analyzer = pipeline("sentiment-analysis")
+emotion_analyzer = pipeline(
+    "text-classification",
+    model="j-hartmann/emotion-english-distilroberta-base",
+    return_all_scores=False
+)
+
+class JournalEntryView(APIView):
+    """Create and analyze a new journal entry"""
+
+    def post(self, request):
+        text = request.data.get("text", "")
+        if not text:
+            return Response({"error": "Text is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Run sentiment + emotion analysis
+        sentiment_result = sentiment_analyzer(text)[0]
+        sentiment = sentiment_result["label"].lower()
+
+        emotion_result = emotion_analyzer(text)[0]
+        emotion = emotion_result["label"].lower()
+
+        # Generate justification
+        sentiment_justification, emotion_justification = self.generate_justification(text, sentiment, emotion)
+
+        # Generate empathetic feedback
+        feedback = self.generate_feedback(sentiment, emotion, text)
+
+        # Save to DB
+        entry = JournalEntry.objects.create(
+            text=text,
+            sentiment=sentiment,
+            emotion=emotion,
+            sentiment_justification=sentiment_justification,
+            emotion_justification=emotion_justification,
+            ai_feedback=feedback,
+        )
+
+        serializer = JournalEntrySerializer(entry)
+        
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    
+    def generate_feedback(self, sentiment, emotion, text=None):
+        """
+        Generate empathetic feedback using OpenAI based on the user's journal entry,
+        detected sentiment, and emotion.
+        """
+
+        prompt = f"""
+            You are an emotionally intelligent wellness assistant helping users reflect on their journal entries.
+
+            Journal text: "{text}"
+            Detected sentiment: {sentiment}
+            Detected emotion: {emotion}
+
+            Based on this information, write a brief (2–3 sentences) personal response to the user that:
+            - acknowledges or reflects their expressed mood or experience,
+            - encourages self-awareness and healthy reflection,
+            - maintains a warm, understanding, and supportive tone without assuming the user feels bad or needs fixing.
+
+            Your response should feel natural and human—like a thoughtful friend acknowledging what the person shared.
+            Avoid being overly positive or therapeutic unless it matches the tone of the entry.
+        """
+
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",  # you can also use gpt-4o or gpt-3.5-turbo
+                messages=[
+                    {"role": "system", "content": "You are an empathetic wellness assistant."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.8,
+                max_tokens=100,
+            )
+
+            feedback = response.choices[0].message.content.strip()
+            return feedback
+
+        except Exception as e:
+            print("OpenAI feedback generation failed:", str(e))
+            return "Keep reflecting on your feelings—awareness is a powerful first step."
+        
+
+    def generate_justification(self, text, sentiment, emotion):
+        
+        prompt = f"""
+            You are an AI assistant explaining why a model might have detected this sentiment and emotion.
+
+            Journal text: "{text}"
+            Detected sentiment: {sentiment}
+            Detected emotion: {emotion}
+
+            Explain briefly (1–2 sentences each) why a model might have detected from Journal text:
+            1. This sentiment
+            2. This emotion
+
+            The explanation should focus on linguistic or emotional cues in the text (e.g., words, tone, phrasing).
+            Keep it natural, not technical.
+            
+            Strictly return ONLY a JSON like this:
+            {
+                {
+                "sentiment_justification": "...",
+                "emotion_justification": "..."
+                }
+            }
+
+            (Of course the value must the justification)
+        """
+
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": "You are an assistant explaining AI sentiment and emotion detection clearly and simply."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.6,
+                max_tokens=150,
+            )
+
+            content = response.choices[0].message.content.strip()
+
+            content = response.choices[0].message.content.strip()
+            
+            try:
+                data = json.loads(content)
+                sentiment_justification = data.get("sentiment_justification", "")
+                emotion_justification = data.get("emotion_justification", "")
+
+            except json.JSONDecodeError:
+                sentiment_justification = emotion_justification = content
+                
+            return sentiment_justification, emotion_justification
+
+        except Exception as e:
+            print("Justification generation failed:", str(e))
+            return "Model reasoning unavailable.", "Model reasoning unavailable."
+        
+
+    def get(self, request):
+        entries = JournalEntry.objects.all().order_by("-date")
+        serializer = JournalEntrySerializer(entries, many=True)
+        return Response(serializer.data)

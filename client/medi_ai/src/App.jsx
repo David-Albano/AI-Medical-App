@@ -2,6 +2,7 @@ import { Routes, Route, Link } from "react-router-dom";
 import KnowledgeUploadPage from "./chatbot/pages/KnowledgeUploadPage";
 import ChatBot from "./chatbot/pages/ChatBot";
 import "./App.css";
+import JournalEntryPage from "./journal/pages/JournalEntryPage";
 
 // Navbar component
 function Navbar() {
@@ -30,6 +31,7 @@ function MainPage() {
       <h1>Main Dashboard</h1>
       <div className="cards-container">
         <DashboardCard title="Chatbot" to="/chatbot" />
+        <DashboardCard title="Journal Entries" to="/journal-entries" />
         <DashboardCard title="Knowledge Upload" to="/knowledge-upload" />
       </div>
     </div>
@@ -52,6 +54,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/chatbot" element={<ChatBot />} />
+        <Route path="/journal-entries" element={<JournalEntryPage />} />
         <Route path="/knowledge-upload" element={<KnowledgeUploadPage />} />
       </Routes>
     </Layout>
