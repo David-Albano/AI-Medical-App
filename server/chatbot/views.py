@@ -18,7 +18,6 @@ class GetMedicalCategories(APIView):
 
     def get(self, request):
         try:
-
             medical_categories = MedicalCategory.objects.all()
             medical_categories_serialized = MedicalCategorySerializer(medical_categories, many=True)
 
@@ -102,16 +101,23 @@ def upload_knowledge_files(request):
 
 
 class ChatbotAPIView(APIView):
-    def post(self, request, session_pk=None):
+    def post(self, request, session_id=None):
+        answer = 'Default answer text'
+
         user_message = request.data.get("message")
+        knowledge_categories = request.data.get("knowledge_categories", [])
+
         if not user_message:
             return Response({"error": "Message required"}, status=400)
 
-        session, _ = ChatSession.objects.get_or_create(session_pk=session_pk or "default")
+        if not knowledge_categories:
+            return Response({"error": "Select at least one category"}, status=400)
+
+        session, _ = ChatSession.objects.get_or_create(session_id=session_id or "default")
         ChatMessage.objects.create(session=session, role="user", content=user_message)
 
         # === RAG retrieval ===
-        context_chunks = retrieve_relevant_chunks(user_message)
+        context_chunks = retrieve_relevant_chunks(user_message, knowledge_categories)
         context_text = "\n\n".join(context_chunks) or "No relevant data found."
 
         # === LLM Response ===
@@ -129,9 +135,11 @@ class ChatbotAPIView(APIView):
                 {"role": "user", "content": prompt}
             ],
         )
+        
         answer = response.choices[0].message.content.strip()
 
         ChatMessage.objects.create(session=session, role="assistant", content=answer)
+        
         return Response({"answer": answer})
     
     

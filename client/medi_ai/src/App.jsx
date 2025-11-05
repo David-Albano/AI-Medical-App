@@ -1,26 +1,24 @@
-// src/App.jsx
 import { Routes, Route, Link } from "react-router-dom";
 import KnowledgeUploadPage from "./chatbot/pages/KnowledgeUploadPage";
+import ChatBot from "./chatbot/pages/ChatBot";
+import "./App.css";
+
+// Reusable DashboardCard component
+function DashboardCard({ title, to }) {
+  return (
+    <Link to={to} className="dashboard-card">
+      <h3>{title}</h3>
+    </Link>
+  );
+}
 
 function MainPage() {
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
+    <div className="main-page">
       <h1>Main Dashboard</h1>
-      <div style={{ display: "flex", justifyContent: "center", gap: "20px", marginTop: "30px" }}>
-        {/* Future apps here */}
-        <Link to="/knowledge-upload">
-          <div style={{
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-            padding: "20px",
-            width: "200px",
-            cursor: "pointer",
-            backgroundColor: "#f5f5f5",
-          }}>
-            <h3>Knowledge Upload</h3>
-            <p>Go to chatbot</p>
-          </div>
-        </Link>
+      <div className="cards-container">
+        <DashboardCard title="Chatbot" to="/chatbot" />
+        <DashboardCard title="Knowledge Upload" to="/knowledge-upload" />
       </div>
     </div>
   );
@@ -28,10 +26,10 @@ function MainPage() {
 
 export default function App() {
   return (
-      <Routes>
-        <Route path="/" element={<MainPage />} />
-        <Route path="/knowledge-upload" element={<KnowledgeUploadPage />} />
-      </Routes>
-      
+    <Routes>
+      <Route path="/" element={<MainPage />} />
+      <Route path="/chatbot" element={<ChatBot />} />
+      <Route path="/knowledge-upload" element={<KnowledgeUploadPage />} />
+    </Routes>
   );
 }
