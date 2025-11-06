@@ -60,7 +60,20 @@ const JournalEntryPage = () => {
 
                 {responseData && (
                     <div className="feedback-section">
-                        <h2>Your Reflection Summary</h2>
+                        <h2 className="reflection-title">
+                            Your Reflection Summary
+                            <span className="info-icon">ℹ️
+                                <span className="tooltip-text">
+                                <strong>Sentiment</strong> — Measures the overall tone of your entry (e.g., Positive, Neutral, Negative).  
+                                <br /><br />
+                                <strong>Score</strong> — Confidence of that sentiment, ranging from 0 to 1 (closer to 1 = higher confidence).  
+                                <br /><br />
+                                <strong>Emotion</strong> — The dominant emotional tone (e.g., Joy, Sadness, Anger, Calm).  
+                                <br /><br />
+                                <strong>Emotion Score</strong> — How strongly that emotion was detected (also from 0 to 1).
+                                </span>
+                            </span>
+                        </h2>
 
                         <div className="feedback-card">
                             <div className="feedback-block sentiment-block">
@@ -89,7 +102,7 @@ const JournalEntryPage = () => {
                                 {responseData.model_result_justification && (
                                     <p className="justification">
                                         <p style={{fontSize: "11px", fontWeight: "bold"}}>Feedback justification:</p>
-                                        <em>{responseData.model_result_justification}</em>
+                                        <pre>{responseData.model_result_justification}</pre>
                                     </p>
                                 )}
                             </div>

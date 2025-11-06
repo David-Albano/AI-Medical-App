@@ -122,8 +122,6 @@ class JournalEntryView(APIView):
             Strictly return response with this structure:
             
                 Sentiment Justification: ...
-
-
                 Emotion Justification: ...
                 
             With two escape sequence between Sentiment Justification and Emotion Justification

@@ -7,3 +7,4 @@ client/node_modules
 server/chatbot/__pycache__/urls.cpython-313.pyc
 server/medical_ai/__pycache__/urls.cpython-313.pyc
 server/.env
+server/db.sqlite3
