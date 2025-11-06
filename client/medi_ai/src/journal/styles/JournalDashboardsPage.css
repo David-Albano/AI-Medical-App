@@ -2,16 +2,16 @@
   fill: #ebedf0;
 }
 .color-scale-1 {
-  fill: #9be9a8;
+  fill: #add8ff; /* light blue */
 }
 .color-scale-2 {
-  fill: #40c463;
+  fill: #5ab4f8; /* medium light blue */
 }
 .color-scale-3 {
-  fill: #30a14e;
+  fill: #257bd6; /* medium blue */
 }
 .color-scale-4 {
-  fill: #216e39;
+  fill: #0b4ba3; /* dark blue */
 }
 
 .react-calendar-heatmap text {

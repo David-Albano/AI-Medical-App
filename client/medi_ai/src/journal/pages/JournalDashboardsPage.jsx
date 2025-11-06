@@ -18,12 +18,12 @@ function JournalDashboardsPage() {
         }}
       > 
           <div style={{ display: "flex", flexDirection: "column", gap: "2rem", }}>
-              <div style={{ width: "1100px", padding: '1rem', background: '#f9f9f9', borderRadius: '8px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }}>
+              <div style={{ width: "1000px", padding: '1rem', background: '#f9f9f9', borderRadius: '8px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }}>
                 <h2 style={{ textAlign: 'center' }}>Sentiment Over Time</h2>
                 <SentimentChart />
               </div>
 
-              <div style={{width: "1100px",  padding: '1rem', background: '#f9f9f9', borderRadius: '8px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }}>
+              <div style={{width: "1000px",  padding: '1rem', background: '#f9f9f9', borderRadius: '8px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }}>
                 <h2 style={{ textAlign: 'center' }}>Daily Journal Activity</h2>
                 <JournalHeatmap />
               </div>
