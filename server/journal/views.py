@@ -6,17 +6,10 @@ from transformers import pipeline
 from medical_ai.openai_client import get_openai_client
 from .models import JournalEntry
 from .serializers import JournalEntrySerializer
+from .settings import sentiment_analysis_model, text_classification_model
 
 client = get_openai_client()
 
-
-# Initialize Hugging Face pipelines (do this once)
-sentiment_analyzer = pipeline("sentiment-analysis")
-emotion_analyzer = pipeline(
-    "text-classification",
-    model="j-hartmann/emotion-english-distilroberta-base",
-    return_all_scores=False
-)
 
 class JournalEntryView(APIView):
     """Create and analyze a new journal entry"""
@@ -26,15 +19,29 @@ class JournalEntryView(APIView):
         if not text:
             return Response({"error": "Text is required"}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Initialize Hugging Face pipelines (do this once)
+        sentiment_analyzer = pipeline("sentiment-analysis")
+        emotion_analyzer = pipeline("text-classification", model=text_classification_model)
+        
+
         # Run sentiment + emotion analysis
         sentiment_result = sentiment_analyzer(text)[0]
+        sentiment_score = round(sentiment_result["score"], 7)
         sentiment = sentiment_result["label"].lower()
 
         emotion_result = emotion_analyzer(text)[0]
+        emotion_score = round(emotion_result["score"], 7)
         emotion = emotion_result["label"].lower()
 
+
+        # print('\n\n 111111 sentiment_analyzer: ', sentiment_analyzer(text), '\n\n=============')
+        # print('\n\n 111111 emotion_analyzer: ', emotion_analyzer(text))
+
+        # print('\n\n 22222 sentiment_result: ', sentiment_result, '\n\n=============')
+        # print('\n\n 22222 emotion_result: ', emotion_result)
+
         # Generate justification
-        sentiment_justification, emotion_justification = self.generate_justification(text, sentiment, emotion)
+        model_result_justification = self.generate_justification(text, sentiment, emotion)
 
         # Generate empathetic feedback
         feedback = self.generate_feedback(sentiment, emotion, text)
@@ -44,8 +51,9 @@ class JournalEntryView(APIView):
             text=text,
             sentiment=sentiment,
             emotion=emotion,
-            sentiment_justification=sentiment_justification,
-            emotion_justification=emotion_justification,
+            sentiment_score=sentiment_score,
+            emotion_score=emotion_score,
+            model_result_justification=model_result_justification,
             ai_feedback=feedback,
         )
 
@@ -111,15 +119,15 @@ class JournalEntryView(APIView):
             The explanation should focus on linguistic or emotional cues in the text (e.g., words, tone, phrasing).
             Keep it natural, not technical.
             
-            Strictly return ONLY a JSON like this:
-            {
-                {
-                "sentiment_justification": "...",
-                "emotion_justification": "..."
-                }
-            }
+            Strictly return response with this structure:
+            
+                Sentiment Justification: ...
 
-            (Of course the value must the justification)
+
+                Emotion Justification: ...
+                
+            With two escape sequence between Sentiment Justification and Emotion Justification
+            (Of course instead of ellipsis must be the justification)
         """
 
         try:
@@ -134,22 +142,12 @@ class JournalEntryView(APIView):
             )
 
             content = response.choices[0].message.content.strip()
-
-            content = response.choices[0].message.content.strip()
-            
-            try:
-                data = json.loads(content)
-                sentiment_justification = data.get("sentiment_justification", "")
-                emotion_justification = data.get("emotion_justification", "")
-
-            except json.JSONDecodeError:
-                sentiment_justification = emotion_justification = content
                 
-            return sentiment_justification, emotion_justification
+            return content
 
         except Exception as e:
             print("Justification generation failed:", str(e))
-            return "Model reasoning unavailable.", "Model reasoning unavailable."
+            return "Model reasoning unavailable."
         
 
     def get(self, request):

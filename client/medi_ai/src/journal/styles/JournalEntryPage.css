@@ -46,7 +46,7 @@ h2 {
 /* Journal Textarea */
 .journal-textarea {
     width: 92%;
-    height: 8rem;
+    height: 15rem;
     padding: 16px;
     border: 1px solid #e2e8f0;
     border-radius: var(--radius);
@@ -135,8 +135,16 @@ h2 {
 
 .sub_block_feedback {
     display: flex;
+    justify-content: space-between;
     align-items: start;
     gap: 5px;
+    width: 70%;
+}
+
+.line_flex_feedback {
+    display: flex;
+    gap: .5rem;
+    align-items: start;
 }
 
 /* Justification style */

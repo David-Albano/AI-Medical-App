@@ -60,8 +60,10 @@ def split_text_into_chunks(text, max_tokens=7500, model="text-embedding-3-small"
         if current_length + paragraph_len > max_tokens:
             if current_tokens:
                 chunks.append(enc.decode(current_tokens))
+
             current_tokens = tokens
             current_length = paragraph_len
+            
         else:
             current_tokens.extend(tokens)
             current_length += paragraph_len

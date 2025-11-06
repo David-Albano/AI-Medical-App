@@ -6,8 +6,9 @@ class JournalEntry(models.Model):
     text = models.TextField()
     sentiment = models.CharField(max_length=20, blank=True, null=True)
     emotion = models.CharField(max_length=50, blank=True, null=True)
-    sentiment_justification = models.TextField(blank=True, null=True)
-    emotion_justification = models.TextField(blank=True, null=True)
+    model_result_justification = models.TextField(blank=True, null=True)
+    sentiment_score = models.FloatField(blank=True, null=True)
+    emotion_score = models.FloatField(blank=True, null=True)
     ai_feedback = models.TextField(blank=True, null=True)
 
     def __str__(self):
