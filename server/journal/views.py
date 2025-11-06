@@ -1,5 +1,8 @@
 import json
+from django.db.models import Count, Avg, DateField
+from django.db.models.functions import Cast
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from transformers import pipeline
@@ -26,11 +29,11 @@ class JournalEntryView(APIView):
 
         # Run sentiment + emotion analysis
         sentiment_result = sentiment_analyzer(text)[0]
-        sentiment_score = round(sentiment_result["score"], 7)
+        sentiment_score = round(sentiment_result["score"], 3)
         sentiment = sentiment_result["label"].lower()
 
         emotion_result = emotion_analyzer(text)[0]
-        emotion_score = round(emotion_result["score"], 7)
+        emotion_score = round(emotion_result["score"], 3)
         emotion = emotion_result["label"].lower()
 
 
@@ -41,10 +44,10 @@ class JournalEntryView(APIView):
         # print('\n\n 22222 emotion_result: ', emotion_result)
 
         # Generate justification
-        model_result_justification = self.generate_justification(text, sentiment, emotion)
+        model_result_justification = self.generate_justification(text, sentiment, sentiment_score, emotion_score, emotion)
 
         # Generate empathetic feedback
-        feedback = self.generate_feedback(sentiment, emotion, text)
+        feedback = self.generate_feedback(sentiment, emotion, sentiment_score, emotion_score, text)
 
         # Save to DB
         entry = JournalEntry.objects.create(
@@ -62,18 +65,20 @@ class JournalEntryView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     
-    def generate_feedback(self, sentiment, emotion, text=None):
+    def generate_feedback(self, sentiment, emotion, sentiment_score, emotion_score, text=None):
         """
         Generate empathetic feedback using OpenAI based on the user's journal entry,
         detected sentiment, and emotion.
         """
 
         prompt = f"""
-            You are an emotionally intelligent wellness assistant helping users reflect on their journal entries.
+            You are an emotionally intelligent medical/wellness assistant helping users reflect on their journal entries.
 
             Journal text: "{text}"
             Detected sentiment: {sentiment}
+            Sentiment Score: {sentiment_score}
             Detected emotion: {emotion}
+            Emotion Score: {emotion_score}
 
             Based on this information, write a brief (2–3 sentences) personal response to the user that:
             - acknowledges or reflects their expressed mood or experience,
@@ -88,7 +93,7 @@ class JournalEntryView(APIView):
             response = client.chat.completions.create(
                 model="gpt-4o-mini",  # you can also use gpt-4o or gpt-3.5-turbo
                 messages=[
-                    {"role": "system", "content": "You are an empathetic wellness assistant."},
+                    {"role": "system", "content": "You are an empathetic medical/wellness assistant."},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.8,
@@ -103,14 +108,16 @@ class JournalEntryView(APIView):
             return "Keep reflecting on your feelings—awareness is a powerful first step."
         
 
-    def generate_justification(self, text, sentiment, emotion):
+    def generate_justification(self, text, sentiment, emotion, sentiment_score, emotion_score):
         
         prompt = f"""
             You are an AI assistant explaining why a model might have detected this sentiment and emotion.
 
             Journal text: "{text}"
             Detected sentiment: {sentiment}
+            Sentiment Score: {sentiment_score}
             Detected emotion: {emotion}
+            Emotion Score: {emotion_score}
 
             Explain briefly (1–2 sentences each) why a model might have detected from Journal text:
             1. This sentiment
@@ -152,3 +159,56 @@ class JournalEntryView(APIView):
         entries = JournalEntry.objects.all().order_by("-date")
         serializer = JournalEntrySerializer(entries, many=True)
         return Response(serializer.data)
+
+
+# 1. Sentiment Over Time
+@api_view(['GET'])
+def sentiment_over_time(request):
+    try:
+        data = (
+            JournalEntry.objects
+            .filter(date__range=("2025-11-01", "2025-12-31"))
+            .exclude(sentiment__isnull=True)
+            .annotate(date_only=Cast('date', output_field=DateField()))
+            .values('date_only')
+            .annotate(avg_sentiment_score=Avg('sentiment_score'))
+            .order_by('date_only')
+        )
+
+        return Response(list(data))
+    except Exception as e:
+        raise Exception(str(e))
+
+
+# 2. Emotion Proportion Pie/Donut
+@api_view(['GET'])
+def emotion_proportion(request):
+    try:
+        data = (
+            JournalEntry.objects
+            .exclude(emotion__isnull=True)
+            .values('emotion')
+            .annotate(count=Count('id'))
+        )
+
+        return Response(list(data))
+    
+    except Exception as e:
+        raise Exception(str(e))
+
+
+# 3. Daily Journal Activity (for Heatmap)
+@api_view(['GET'])
+def daily_journal_activity(request):
+    try:
+        data = (
+            JournalEntry.objects
+            .annotate(date_only=Cast('date', output_field=DateField()))
+            .values('date_only')
+            .annotate(count=Count('id'))
+            .order_by('date_only')
+        )
+        return Response(list(data))
+    
+    except Exception as e:
+        raise Exception(str(e))

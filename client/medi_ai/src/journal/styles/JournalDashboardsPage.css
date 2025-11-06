@@ -1,0 +1,20 @@
+.color-empty {
+  fill: #ebedf0;
+}
+.color-scale-1 {
+  fill: #9be9a8;
+}
+.color-scale-2 {
+  fill: #40c463;
+}
+.color-scale-3 {
+  fill: #30a14e;
+}
+.color-scale-4 {
+  fill: #216e39;
+}
+
+.react-calendar-heatmap text {
+  fill: #555;
+  font-size: 9px;
+}

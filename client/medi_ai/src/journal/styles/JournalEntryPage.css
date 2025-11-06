@@ -276,3 +276,29 @@ pre {
 .journal-entry-card {
     animation: gentleFloat 6s ease-in-out infinite;
 }
+
+.journal-dashboard-link {
+    position: absolute;
+    top: 10%;
+    right: 10%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 150px;
+    height: 2rem;
+    padding: 4px;
+    border: 1px solid #9fc3e0;
+    border-radius: 8px;
+    background-color: #fff;
+    cursor: pointer;
+    text-decoration: none;
+    color: #5a8dee;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.journal-dashboard-link:hover {
+    background-color: #5a8dee;
+    border: 1px solid #686464;
+    color: #fff;
+    transition: background 0.3s ease;
+}

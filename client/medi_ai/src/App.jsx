@@ -3,6 +3,7 @@ import KnowledgeUploadPage from "./chatbot/pages/KnowledgeUploadPage";
 import ChatBot from "./chatbot/pages/ChatBot";
 import "./App.css";
 import JournalEntryPage from "./journal/pages/JournalEntryPage";
+import JournalDashboardsPage from "./journal/pages/JournalDashboardsPage";
 
 // Navbar component
 function Navbar() {
@@ -55,6 +56,7 @@ export default function App() {
         <Route path="/" element={<MainPage />} />
         <Route path="/chatbot" element={<ChatBot />} />
         <Route path="/journal-entries" element={<JournalEntryPage />} />
+        <Route path="/journal-dashboard" element={<JournalDashboardsPage />} />
         <Route path="/knowledge-upload" element={<KnowledgeUploadPage />} />
       </Routes>
     </Layout>

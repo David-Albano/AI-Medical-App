@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/JournalEntryPage.css';  // Import CSS for styling
 
@@ -38,6 +39,12 @@ const JournalEntryPage = () => {
 
     return (
         <div className="journal-entry-container">
+            <div>
+                <Link to="/journal-dashboard" className="journal-dashboard-link">
+                    <h4>Your Entries Stats</h4>
+                </Link>
+            </div>
+
             <div className="journal-entry-card">
                 <h1>Write Your Journal Entry</h1>
                 <p style={{ color: '#6b7280', marginBottom: '20px' }}>
