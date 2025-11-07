@@ -1,10 +1,11 @@
 import os, json, tiktoken
 from django.shortcuts import render
 from django.db import transaction
-from chatbot.knowledge_helpers import extract_text_from_file, split_text_into_chunks
 from chatbot.rag_utils import retrieve_relevant_chunks
 from chatbot.serializers import MedicalCategorySerializer
+from medical_ai.helpers import extract_text_from_file, split_text_into_chunks
 from medical_ai.openai_client import get_openai_client
+from medical_ai.settings import TEXT_EMBEDDING_MODEL
 from .models import ChatMessage, ChatSession, KnowledgeChunk, MedicalCategory
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -68,14 +69,14 @@ def upload_knowledge_files(request):
                 chunks = split_text_into_chunks(text)
 
                 for chunk in chunks:
-                    tokens = tiktoken.encoding_for_model("text-embedding-3-small").encode(chunk)
+                    tokens = tiktoken.encoding_for_model(TEXT_EMBEDDING_MODEL).encode(chunk)
 
                     if len(tokens) > 8192:
                         # truncate safely
-                        chunk = tiktoken.encoding_for_model("text-embedding-3-small").decode(tokens[:8192])
+                        chunk = tiktoken.encoding_for_model(TEXT_EMBEDDING_MODEL).decode(tokens[:8192])
 
                     embedding = client.embeddings.create(
-                        model="text-embedding-3-small",
+                        model=TEXT_EMBEDDING_MODEL,
                         input=chunk
                     ).data[0].embedding
 
@@ -102,44 +103,47 @@ def upload_knowledge_files(request):
 
 class ChatbotAPIView(APIView):
     def post(self, request, session_id=None):
-        answer = 'Default answer text'
+        try:
+            answer = 'Default answer text'
 
-        user_message = request.data.get("message")
-        knowledge_categories = request.data.get("knowledge_categories", [])
+            user_message = request.data.get("message")
+            knowledge_categories = request.data.get("knowledge_categories", [])
 
-        if not user_message:
-            return Response({"error": "Message required"}, status=400)
+            if not user_message:
+                return Response({"error": "Message required"}, status=400)
 
-        if not knowledge_categories:
-            return Response({"error": "Select at least one category"}, status=400)
+            if not knowledge_categories:
+                return Response({"error": "Select at least one category"}, status=400)
 
-        session, _ = ChatSession.objects.get_or_create(session_id=session_id or "default")
-        ChatMessage.objects.create(session=session, role="user", content=user_message)
+            session, _ = ChatSession.objects.get_or_create(session_id=session_id or "default")
+            ChatMessage.objects.create(session=session, role="user", content=user_message)
 
-        # === RAG retrieval ===
-        context_chunks = retrieve_relevant_chunks(user_message, knowledge_categories)
-        context_text = "\n\n".join(context_chunks) or "No relevant data found."
+            # === RAG retrieval ===
+            context_chunks = retrieve_relevant_chunks(user_message, knowledge_categories)
+            context_text = "\n\n".join(context_chunks) or "No relevant data found."
 
-        # === LLM Response ===
-        prompt = f"""You are a helpful health assistant.
-        Use this context to answer accurately and clearly:
-        {context_text}
+            # === LLM Response ===
+            prompt = f"""You are a helpful health assistant.
+            Use this context to answer accurately and clearly:
+            {context_text}
 
-        User question: {user_message}
-        """
+            User question: {user_message}
+            """
 
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You explain health info simply and accurately."},
-                {"role": "user", "content": prompt}
-            ],
-        )
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": "You explain health info simply and accurately."},
+                    {"role": "user", "content": prompt}
+                ],
+            )
+            
+            answer = response.choices[0].message.content.strip()
+
+            ChatMessage.objects.create(session=session, role="assistant", content=answer)
+            
+            return Response({"answer": answer})
         
-        answer = response.choices[0].message.content.strip()
-
-        ChatMessage.objects.create(session=session, role="assistant", content=answer)
-        
-        return Response({"answer": answer})
-    
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     

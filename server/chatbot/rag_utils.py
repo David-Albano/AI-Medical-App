@@ -1,11 +1,12 @@
 # chatbot/rag_utils.py
 import numpy as np
 from medical_ai.openai_client import get_openai_client
+from medical_ai.settings import TEXT_EMBEDDING_MODEL
 from .models import KnowledgeChunk
 
 client = get_openai_client()
 
-def get_embedding(text, model="text-embedding-3-small"):
+def get_embedding(text, model=TEXT_EMBEDDING_MODEL):
     """Get OpenAI embedding vector for a given text."""
     res = client.embeddings.create(input=text, model=model)
     return res.data[0].embedding

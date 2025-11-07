@@ -4,6 +4,7 @@ import ChatBot from "./chatbot/pages/ChatBot";
 import "./App.css";
 import JournalEntryPage from "./journal/pages/JournalEntryPage";
 import JournalDashboardsPage from "./journal/pages/JournalDashboardsPage";
+import GuidelinesUploadPage from "./guidelines/pages/GuidelinesUploadPage";
 
 // Navbar component
 function Navbar() {
@@ -34,6 +35,7 @@ function MainPage() {
         <DashboardCard title="Chatbot" to="/chatbot" />
         <DashboardCard title="Journal Entries" to="/journal-entries" />
         <DashboardCard title="Knowledge Upload" to="/knowledge-upload" />
+        <DashboardCard title="Guidelines" to="/guidelines" />
       </div>
     </div>
   );
@@ -58,6 +60,7 @@ export default function App() {
         <Route path="/journal-entries" element={<JournalEntryPage />} />
         <Route path="/journal-dashboard" element={<JournalDashboardsPage />} />
         <Route path="/knowledge-upload" element={<KnowledgeUploadPage />} />
+        <Route path="/guidelines" element={<GuidelinesUploadPage />} />
       </Routes>
     </Layout>
   );
